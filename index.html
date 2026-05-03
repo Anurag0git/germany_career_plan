@@ -3,41 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Germany 2033 Master Plan: DevOps/AI</title>
+    <title>Germany 2033 Command Center & Action Plan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Chosen Palette: Professional Slate with Tech Indigo (Career), Emerald (Finance), and Amber (Academic) accents. -->
-    <!-- Application Structure Plan: A centralized command center dashboard with 4 main tabs merging all previous contexts. 
-         1. 'Profile & Overview' sets the stage with the user's specific constraints (21yo, Cerence AI, E&TC, 7LPA) and compares the two macro paths.
-         2. 'Academic Pivot (MS)' deeply addresses the E&TC to IT transition challenge (ECTS rules) and the checklist for the student route.
-         3. 'Career Fast-Track' details the DevOps/AI progression plan and clearly delineates the Visa rules (Direct Job vs Chancenkarte blocked account needs).
-         4. 'Financial Engine' combines the 2033 upfront cost comparisons (bar chart) with the interactive SIP simulator (line chart) based on their current 40k base + 1k SIP. 
-         This structure ensures the user can easily navigate from high-level strategy to granular financial planning without losing context. -->
-    <!-- Visualization & Content Choices: 
-         1. Stat Cards & Checklists (HTML/Tailwind): Goal: Inform/Organize -> Justification: Breaks down complex academic/visa rules and profile assessments into scannable chunks.
-         2. Upfront Cost Comparison (Chart.js Bar): Goal: Compare -> Justification: Starkly highlights the €0 blocked account need for Direct Jobs vs the heavy burden of MS/Chancenkarte.
-         3. SIP Simulator (Chart.js Line + Input): Goal: Change/Plan -> Justification: Actively engages the user to see how scaling their 1k SIP from their new 7LPA salary impacts their 2033 target.
-         Library: Chart.js for all data visualization. Vanilla JS for interactions. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
     <style>
         body {
-            background-color: #f8fafc; /* slate-50 */
-            color: #334155; /* slate-700 */
+            background-color: #f8fafc;
+            color: #334155;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow-x: hidden;
         }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .nav-btn {
             transition: all 0.3s ease;
             border-bottom: 3px solid transparent;
         }
         .nav-btn.active {
-            color: #4f46e5; /* indigo-600 */
+            color: #4f46e5;
             border-bottom-color: #4f46e5;
-            background-color: #eef2ff; /* indigo-50 */
+            background-color: #eef2ff;
             font-weight: 600;
         }
+        
         .chart-container {
             position: relative;
             width: 100%;
@@ -48,21 +38,22 @@
             max-height: 350px;
         }
         @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
+            .chart-container { height: 350px; }
         }
+        .donut-container {
+            position: relative;
+            width: 100%;
+            max-width: 250px;
+            margin: 0 auto;
+            height: 250px;
+        }
+
         .glass-card {
             background: rgba(255, 255, 255, 0.95);
             border: 1px solid rgba(226, 232, 240, 0.8);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
-        .interactive-row:hover {
-            background-color: #f1f5f9;
-            transform: translateX(4px);
-            transition: all 0.2s ease;
-        }
-        /* Custom Range Slider */
+        
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
@@ -73,7 +64,7 @@
             height: 20px;
             width: 20px;
             border-radius: 50%;
-            background: #10b981; /* emerald-500 */
+            background: #10b981;
             cursor: pointer;
             margin-top: -8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -85,6 +76,63 @@
             background: #cbd5e1;
             border-radius: 3px;
         }
+
+        .task-card {
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+        .task-card:hover {
+            background-color: #f1f5f9;
+            transform: translateX(4px);
+        }
+        .task-card.tech { border-left-color: #6366f1; }
+        .task-card.lang { border-left-color: #f59e0b; }
+        .task-card.finance { border-left-color: #10b981; }
+        
+        .custom-checkbox {
+            appearance: none;
+            background-color: #fff;
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.5em;
+            height: 1.5em;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.25em;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .custom-checkbox::before {
+            content: "";
+            width: 0.8em;
+            height: 0.8em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em white;
+            background-color: transparent;
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .custom-checkbox:checked {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+        .custom-checkbox:checked::before { transform: scale(1); }
+        .task-completed .task-text {
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+        
+        .local-sync {
+            display: inline-block;
+            transition: opacity 0.3s ease;
+        }
+        .local-sync.saving { opacity: 1; color: #3b82f6; }
+        .local-sync.saved { opacity: 1; color: #10b981; }
+        .local-sync.idle { opacity: 0; }
+
         .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -94,14 +142,22 @@
     <!-- Header & Navigation -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-            <h1 class="text-2xl md:text-3xl font-bold text-slate-900">🇩🇪 Project 2033: Germany Relocation Command Center</h1>
-            <p class="text-sm text-slate-500 mt-1">Personalized for: 21yo | DevOps/SDE at Cerence AI | E&TC Grad (Pune Uni) | Target Age: 27/28</p>
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-slate-900">🇩🇪 AI Engineer: 2033 Command Center</h1>
+                    <p class="text-sm text-slate-500 mt-1">Targeting: Senior AI/LLM Engineer | Current: DevOps/SDE at Cerence AI</p>
+                </div>
+                <div id="sync-indicator" class="text-xs font-bold local-sync idle flex items-center bg-slate-100 px-3 py-1.5 rounded-full">
+                    💾 Saved Locally
+                </div>
+            </div>
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto border-t border-slate-100 hide-scrollbar">
-            <button onclick="switchTab('overview')" id="btn-overview" class="nav-btn active px-5 py-4 text-sm whitespace-nowrap text-slate-600 hover:text-indigo-600 hover:bg-slate-50">📊 1. Profile & Overview</button>
-            <button onclick="switchTab('career')" id="btn-career" class="nav-btn px-5 py-4 text-sm whitespace-nowrap text-slate-600 hover:text-indigo-600 hover:bg-slate-50">💼 2. Career & Visas</button>
-            <button onclick="switchTab('academic')" id="btn-academic" class="nav-btn px-5 py-4 text-sm whitespace-nowrap text-slate-600 hover:text-indigo-600 hover:bg-slate-50">🎓 3. Academic Pivot (MS)</button>
-            <button onclick="switchTab('finance')" id="btn-finance" class="nav-btn px-5 py-4 text-sm whitespace-nowrap text-slate-600 hover:text-indigo-600 hover:bg-slate-50">💶 4. Financial Engine</button>
+            <button onclick="window.switchTab('overview')" id="btn-overview" class="nav-btn active px-5 py-4 text-sm whitespace-nowrap text-slate-600 hover:text-indigo-600 hover:bg-slate-50">📊 1. Overview</button>
+            <button onclick="window.switchTab('career')" id="btn-career" class="nav-btn px-5 py-4 text-sm whitespace-nowrap text-slate-600 hover:text-indigo-600 hover:bg-slate-50">💼 2. Visas & Strategy</button>
+            <button onclick="window.switchTab('academic')" id="btn-academic" class="nav-btn px-5 py-4 text-sm whitespace-nowrap text-slate-600 hover:text-indigo-600 hover:bg-slate-50">🎓 3. MS Pivot</button>
+            <button onclick="window.switchTab('finance')" id="btn-finance" class="nav-btn px-5 py-4 text-sm whitespace-nowrap text-slate-600 hover:text-indigo-600 hover:bg-slate-50">💶 4. Simulator</button>
+            <button onclick="window.switchTab('action')" id="btn-action" class="nav-btn px-5 py-4 text-sm whitespace-nowrap text-slate-600 hover:text-indigo-600 hover:bg-slate-50">✅ 5. Action Plan</button>
         </div>
     </header>
 
@@ -110,8 +166,8 @@
         <!-- TAB 1: OVERVIEW & PROFILE -->
         <section id="sec-overview" class="block fade-in">
             <div class="mb-8">
-                <h2 class="text-2xl font-bold text-slate-800">Current Baseline Assessment</h2>
-                <p class="text-slate-600 mt-1">An objective look at your starting parameters as of mid-2026.</p>
+                <h2 class="text-2xl font-bold text-slate-800">Baseline Assessment</h2>
+                <p class="text-slate-600 mt-1">Starting parameters updated with your AI Engineering focus.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -119,20 +175,19 @@
                     <div class="text-3xl mb-2">💻</div>
                     <h3 class="font-bold text-lg text-slate-800 border-b border-slate-200 pb-2 mb-3">Professional Edge</h3>
                     <ul class="text-sm space-y-2 text-slate-600">
-                        <li><strong>Role:</strong> DevOps, SDK, Android.</li>
-                        <li><strong>Company:</strong> Cerence AI. <span class="text-emerald-600 font-semibold">(High Demand Sector)</span></li>
-                        <li><strong>Trajectory:</strong> Transitioning from Intern (25k) to Full-Time SDE (7LPA) in Sept 2026.</li>
-                        <li><strong>Goal Age 28:</strong> ~6.5 years of premium AI/DevOps experience.</li>
+                        <li><strong>Target Role:</strong> AI Engineer (LLMs/MLOps).</li>
+                        <li><strong>Company:</strong> Cerence AI. <span class="text-emerald-600 font-semibold">(Massive advantage)</span></li>
+                        <li><strong>Trajectory:</strong> Intern -> Full-Time AI/DevOps SDE (Sept '26).</li>
+                        <li><strong>Goal Age 28:</strong> ~6.5 years building/deploying AI models. This profile makes you a prime target for German recruiters.</li>
                     </ul>
                 </div>
                 <div class="glass-card rounded-2xl p-6 border-l-4 border-amber-500">
                     <div class="text-3xl mb-2">🎓</div>
                     <h3 class="font-bold text-lg text-slate-800 border-b border-slate-200 pb-2 mb-3">Academic Stats</h3>
                     <ul class="text-sm space-y-2 text-slate-600">
-                        <li><strong>Degree:</strong> B.E. Electronics & Telecommunication (E&TC).</li>
-                        <li><strong>Institution:</strong> Uni of Pune <span class="text-emerald-600 font-semibold">(H+ Status - Recognized)</span>.</li>
-                        <li><strong>Grades:</strong> 8.6 GPA (Strong), 10th 93.6%, 12th 68.8% (Neutral for MS).</li>
-                        <li><strong>Language:</strong> A1 German target by Oct 2026. Perfect pacing.</li>
+                        <li><strong>Degree:</strong> B.E. E&TC (Uni of Pune, H+ Status).</li>
+                        <li><strong>Grades:</strong> 8.6 GPA, 10th 93.6%, 12th 68.8%.</li>
+                        <li><strong>Language:</strong> A1 German target by Oct 2026.</li>
                     </ul>
                 </div>
                 <div class="glass-card rounded-2xl p-6 border-l-4 border-emerald-500">
@@ -140,30 +195,29 @@
                     <h3 class="font-bold text-lg text-slate-800 border-b border-slate-200 pb-2 mb-3">Financial Base</h3>
                     <ul class="text-sm space-y-2 text-slate-600">
                         <li><strong>Emergency Fund:</strong> ₹40,000 (Zero loans/EMIs).</li>
-                        <li><strong>Investments:</strong> ₹1,000/month SIP (Active for 1 year).</li>
-                        <li><strong>Verdict:</strong> Great discipline, but capital is currently too low for an immediate move. You have 7 years to scale this heavily using the new 7LPA salary.</li>
+                        <li><strong>Investments:</strong> ₹1,000/month SIP.</li>
+                        <li><strong>Verdict:</strong> Needs aggressive scaling alongside your upcoming 7LPA package to fund fallback options.</li>
                     </ul>
                 </div>
             </div>
 
-            <h3 class="text-xl font-bold text-slate-800 mb-4">Macro Decision: Career vs. Study</h3>
             <div class="grid md:grid-cols-2 gap-6">
-                <div class="bg-indigo-50 rounded-xl p-6 border border-indigo-100">
-                    <h4 class="font-bold text-indigo-800 text-lg mb-2">💼 Option A: The IT Pro Route (Recommended)</h4>
-                    <p class="text-sm text-slate-700 mb-4">Leveraging your 6+ years of Cerence AI experience to move directly at age 27/28.</p>
+                <div class="bg-indigo-50 rounded-xl p-6 border border-indigo-100 hover:shadow-md transition">
+                    <h4 class="font-bold text-indigo-800 text-lg mb-2">💼 Option A: Direct AI Pro Route (Recommended)</h4>
+                    <p class="text-sm text-slate-700 mb-4">Leverage your Cerence AI experience to move directly as a Senior AI Engineer.</p>
                     <ul class="text-sm space-y-2">
-                        <li>✔️ <strong>High Income:</strong> Enter a senior tax bracket immediately (€70k+).</li>
-                        <li>✔️ <strong>No Study Gap:</strong> You don't lose 2 years of prime earning potential.</li>
-                        <li>✔️ <strong>Fast PR:</strong> EU Blue Card leads to Permanent Residency in ~21 months (with B1 German).</li>
+                        <li>✔️ Peak Market Demand (Germany heavily lacks AI talent).</li>
+                        <li>✔️ Enter senior tax bracket immediately (€75k+).</li>
+                        <li>✔️ Fast PR via EU Blue Card.</li>
                     </ul>
                 </div>
-                <div class="bg-amber-50 rounded-xl p-6 border border-amber-100">
-                    <h4 class="font-bold text-amber-800 text-lg mb-2">🎓 Option B: The MS Route</h4>
-                    <p class="text-sm text-slate-700 mb-4">Pursuing a Master's at a public university to pivot academically or integrate slowly.</p>
+                <div class="bg-amber-50 rounded-xl p-6 border border-amber-100 hover:shadow-md transition">
+                    <h4 class="font-bold text-amber-800 text-lg mb-2">🎓 Option B: MS Student Route</h4>
+                    <p class="text-sm text-slate-700 mb-4">Master's at a public university as a fallback plan.</p>
                     <ul class="text-sm space-y-2">
-                        <li>✔️ <strong>Easy Market Entry:</strong> 18-month job seeker visa post-graduation.</li>
-                        <li>⚠️ <strong>High Opportunity Cost:</strong> Giving up a Senior Indian salary for 2 years of student life/HiWi jobs.</li>
-                        <li>⚠️ <strong>E&TC Challenge:</strong> Strict ECTS rules make pivoting to pure CS difficult (see Tab 3).</li>
+                        <li>✔️ Job Seeker Visa post-graduation.</li>
+                        <li>⚠️ High Opportunity Cost (lose Senior Indian salary).</li>
+                        <li>⚠️ E&TC Challenge (strict ECTS rules for CS degrees).</li>
                     </ul>
                 </div>
             </div>
@@ -172,50 +226,48 @@
         <!-- TAB 2: CAREER & VISAS -->
         <section id="sec-career" class="hidden fade-in">
             <div class="mb-8">
-                <h2 class="text-2xl font-bold text-indigo-900">The DevOps Fast-Track (2026 - 2033)</h2>
-                <p class="text-slate-600 mt-1">How to position your career to bypass the MS route entirely and land a Senior Blue Card role.</p>
+                <h2 class="text-2xl font-bold text-indigo-900">AI Engineering Fast-Track</h2>
+                <p class="text-slate-600 mt-1">How to position your career to become undeniable to European tech companies.</p>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 mb-8">
-                <h3 class="font-bold text-xl text-slate-800 mb-4 border-b pb-2">Skill Specialization Roadmap</h3>
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div class="p-4 bg-slate-50 rounded-xl border-l-4 border-slate-400">
-                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Phase 1 (2026-2028)</div>
-                        <h4 class="font-bold text-slate-800">The T-Shaped Engineer</h4>
-                        <p class="text-sm text-slate-600 mt-2">You do DevOps, SDK, and Android. <strong>Pick one to master deeply.</strong> Germany hires specialists. Given your AI context, Cloud Architecture (AWS/Kubernetes) or MLOps will yield the highest salaries.</p>
+            <div class="bg-indigo-900 rounded-2xl p-6 md:p-8 text-white shadow-lg mb-8">
+                <h3 class="font-bold text-2xl mb-4">The Blocked Account Rule for IT/AI Pros</h3>
+                <p class="text-indigo-200 mb-6">It depends entirely on your visa pathway. Only ONE path requires your own capital.</p>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white/10 p-5 rounded-xl border border-emerald-400/50 relative">
+                        <div class="absolute -top-3 -right-3 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">Goal</div>
+                        <div class="text-3xl mb-2">🤝</div>
+                        <h4 class="font-bold text-xl text-emerald-400 mb-1">Direct Job Offer</h4>
+                        <p class="text-sm text-indigo-100 mb-3">Interview from India, secure contract.</p>
+                        <div class="bg-emerald-500/20 text-emerald-300 px-3 py-2 rounded font-bold text-lg mb-2">Blocked Account: €0 (Zero)</div>
+                        <p class="text-sm text-indigo-200">The contract proves sustenance. You only need initial relocation cash.</p>
                     </div>
-                    <div class="p-4 bg-slate-50 rounded-xl border-l-4 border-indigo-400">
-                        <div class="text-xs font-bold text-indigo-500 uppercase tracking-wider mb-1">Phase 2 (2029-2031)</div>
-                        <h4 class="font-bold text-slate-800">Leadership & Language</h4>
-                        <p class="text-sm text-slate-600 mt-2">Achieve B1 German (you are already on track). Transition into a Senior/Lead role in India. Open source contributions or a strong GitHub portfolio become your resume.</p>
-                    </div>
-                    <div class="p-4 bg-indigo-50 rounded-xl border-l-4 border-indigo-600">
-                        <div class="text-xs font-bold text-indigo-700 uppercase tracking-wider mb-1">Phase 3 (2032-2033)</div>
-                        <h4 class="font-bold text-slate-800">The Job Hunt</h4>
-                        <p class="text-sm text-slate-600 mt-2">Start applying via StepStone.de, LinkedIn, and Xing. Highlight your Anabin H+ degree, 6 years of AI/DevOps experience, and B1 language skills.</p>
+                    
+                    <div class="bg-white/10 p-5 rounded-xl border border-amber-400/50">
+                        <div class="text-3xl mb-2">🎫</div>
+                        <h4 class="font-bold text-xl text-amber-400 mb-1">Chancenkarte</h4>
+                        <p class="text-sm text-indigo-100 mb-3">Job Seeker Visa (go to Germany to search).</p>
+                        <div class="bg-amber-500/20 text-amber-300 px-3 py-2 rounded font-bold text-lg mb-2">Blocked Account: REQUIRED</div>
+                        <p class="text-sm text-indigo-200">Must lock ~€12,324 into a bank to prove survival funds. (Proj. ~€16k by 2033).</p>
                     </div>
                 </div>
             </div>
-
-            <div class="bg-indigo-900 rounded-2xl p-6 md:p-8 text-white shadow-lg">
-                <h3 class="font-bold text-2xl mb-4">Crucial Clarification: The Blocked Account Rule for IT Pros</h3>
-                <p class="text-indigo-200 mb-6">If you go as an IT Professional, do you need a Blocked Account? <strong>It depends entirely on your Visa Type.</strong></p>
-
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white/10 p-5 rounded-xl border border-white/20">
-                        <div class="text-3xl mb-2">🤝</div>
-                        <h4 class="font-bold text-xl text-emerald-400 mb-1">Scenario A: Direct Job Offer</h4>
-                        <p class="text-sm text-indigo-100 mb-3">You interview from India and get a contract before flying.</p>
-                        <div class="bg-emerald-500/20 text-emerald-300 px-3 py-2 rounded font-bold text-lg mb-2">Blocked Account: €0 (Zero)</div>
-                        <p class="text-sm text-indigo-200">The government sees your employment contract as proof of sustenance. You only need money for flights and initial rent deposits (approx. ₹3-4 Lakhs).</p>
+            
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <h3 class="font-bold text-xl text-slate-800 mb-4 border-b pb-2">AI & LLM Skill Specialization (2026-2033)</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-4 bg-slate-50 rounded-xl border-l-4 border-slate-400">
+                        <h4 class="font-bold text-slate-800">1. Deep Specialization</h4>
+                        <p class="text-sm text-slate-600 mt-2">Pivot deeply into developing/training LLMs (PyTorch, HuggingFace) or building scalable MLOps architectures. Become the AI guy.</p>
                     </div>
-                    
-                    <div class="bg-white/10 p-5 rounded-xl border border-white/20">
-                        <div class="text-3xl mb-2">🎫</div>
-                        <h4 class="font-bold text-xl text-amber-400 mb-1">Scenario B: Chancenkarte</h4>
-                        <p class="text-sm text-indigo-100 mb-3">You go to Germany to search for a job for up to 1 year.</p>
-                        <div class="bg-amber-500/20 text-amber-300 px-3 py-2 rounded font-bold text-lg mb-2">Blocked Account: REQUIRED</div>
-                        <p class="text-sm text-indigo-200">Because you have no income guarantee, you must lock ~€12,324 (Current) into a German bank to prove you won't rely on state welfare. By 2033, this will likely be €16,000+.</p>
+                    <div class="p-4 bg-slate-50 rounded-xl border-l-4 border-indigo-400">
+                        <h4 class="font-bold text-slate-800">2. Portfolio & Open Source</h4>
+                        <p class="text-sm text-slate-600 mt-2">Fine-tune open-source models (Llama, Mistral) and deploy them. Publish the endpoints. This is proof of competence.</p>
+                    </div>
+                    <div class="p-4 bg-indigo-50 rounded-xl border-l-4 border-indigo-600">
+                        <h4 class="font-bold text-slate-800">3. Language & Leadership</h4>
+                        <p class="text-sm text-slate-600 mt-2">Maintain A1->B1 progression. Lead AI initiatives at Cerence to secure "Senior" titles before 2033.</p>
                     </div>
                 </div>
             </div>
@@ -225,51 +277,35 @@
         <section id="sec-academic" class="hidden fade-in">
             <div class="mb-8">
                 <h2 class="text-2xl font-bold text-amber-900">The E&TC Academic Pivot</h2>
-                <p class="text-slate-600 mt-1">If you decide to pursue an MS, you must navigate Germany's strict degree continuation rules.</p>
+                <p class="text-slate-600 mt-1">If pursuing an MS, navigate Germany's strict degree continuation rules.</p>
             </div>
 
             <div class="grid lg:grid-cols-2 gap-8 mb-8">
-                <!-- The ECTS Problem -->
                 <div class="bg-white rounded-2xl shadow-sm border border-red-100 p-6 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
-                    <h3 class="font-bold text-xl text-slate-800 mb-3">❌ The Problem: The "ECTS Rule"</h3>
-                    <p class="text-sm text-slate-600 mb-4">German public universities follow a "Consecutive Master's" model. You cannot drastically change your major. To enter a pure <strong>M.Sc. Computer Science</strong>, they scrutinize your Bachelor's transcript for specific ECTS credits:</p>
+                    <h3 class="font-bold text-xl text-slate-800 mb-3">❌ The "ECTS Rule" Problem</h3>
+                    <p class="text-sm text-slate-600 mb-4">You cannot drastically change majors. Pure <strong>M.Sc. Computer Science</strong> requires specific Bachelor's credits:</p>
                     <ul class="text-sm space-y-2 mb-4 bg-slate-50 p-4 rounded-lg">
-                        <li class="flex items-center text-slate-700"><span class="mr-2">➖</span> 20+ credits in Theoretical CS (Automata)</li>
-                        <li class="flex items-center text-slate-700"><span class="mr-2">➖</span> 20+ credits in Practical CS (OS, Data Structures)</li>
-                        <li class="flex items-center text-slate-700"><span class="mr-2">➖</span> Pure Mathematics</li>
+                        <li class="text-slate-700">➖ 20+ ECTS in Theoretical CS (Automata)</li>
+                        <li class="text-slate-700">➖ 20+ ECTS in Practical CS (OS, Data Structures)</li>
                     </ul>
-                    <p class="text-sm font-semibold text-red-700 bg-red-50 p-3 rounded">Your E&TC degree focuses on Signals, Comm., and Microprocessors. Despite an 8.6 GPA, you will likely be rejected from pure CS programs due to missing theoretical CS credits.</p>
+                    <p class="text-sm font-semibold text-red-700 bg-red-50 p-3 rounded">Your E&TC transcript lacks theoretical CS. You face high rejection risk from pure CS programs despite an 8.6 GPA.</p>
                 </div>
 
-                <!-- The Solution -->
                 <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
-                    <h3 class="font-bold text-xl text-slate-800 mb-3">✅ The Solution: Smart Program Selection</h3>
-                    <p class="text-sm text-slate-600 mb-4">Do not apply for pure Computer Science. Leverage your E&TC background alongside your Cerence AI experience by applying to interdisciplinary programs:</p>
+                    <h3 class="font-bold text-xl text-slate-800 mb-3">✅ Interdisciplinary / AI Programs</h3>
+                    <p class="text-sm text-slate-600 mb-4">Apply to programs that value your E&TC math background combined with your Cerence AI experience:</p>
                     <div class="space-y-3">
-                        <div class="interactive-row p-3 border border-slate-200 rounded-lg cursor-pointer">
-                            <h4 class="font-bold text-emerald-700">M.Sc. Embedded Systems / IoT</h4>
-                            <p class="text-xs text-slate-500 mt-1">Perfect fit. Combines your E&TC hardware base with your DevOps/Software skills.</p>
+                        <div class="p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                            <h4 class="font-bold text-emerald-700">M.Sc. Data Science / Artificial Intelligence</h4>
+                            <p class="text-xs text-slate-500 mt-1">Your professional AI experience makes you a strong candidate here, bypassing pure CS restrictions.</p>
                         </div>
-                        <div class="interactive-row p-3 border border-slate-200 rounded-lg cursor-pointer">
-                            <h4 class="font-bold text-emerald-700">M.Sc. Data Science / AI</h4>
-                            <p class="text-xs text-slate-500 mt-1">Many accept E&TC grads, especially since you have professional AI industry experience.</p>
-                        </div>
-                        <div class="interactive-row p-3 border border-slate-200 rounded-lg cursor-pointer">
-                            <h4 class="font-bold text-emerald-700">M.Sc. Information Systems</h4>
-                            <p class="text-xs text-slate-500 mt-1">Blends IT with management. Less strict on theoretical CS ECTS credits.</p>
+                        <div class="p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                            <h4 class="font-bold text-emerald-700">M.Sc. Embedded Systems</h4>
+                            <p class="text-xs text-slate-500 mt-1">Perfect mix of E&TC hardware + Software.</p>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200">
-                <h3 class="font-bold text-lg text-slate-800 mb-3">MS Bureaucratic Pre-requisites (Checklist for 2032)</h3>
-                <div class="grid md:grid-cols-3 gap-4">
-                    <div class="bg-white p-3 rounded shadow-sm border border-slate-100 text-sm"><strong class="block text-amber-700">APS Certificate</strong> Mandatory Indian degree verification.</div>
-                    <div class="bg-white p-3 rounded shadow-sm border border-slate-100 text-sm"><strong class="block text-amber-700">Blocked Account</strong> Proof of funds for 1 year (~₹17L projected).</div>
-                    <div class="bg-white p-3 rounded shadow-sm border border-slate-100 text-sm"><strong class="block text-amber-700">Language Tests</strong> IELTS (6.5+) and Goethe A2/B1.</div>
                 </div>
             </div>
         </section>
@@ -278,23 +314,20 @@
         <section id="sec-finance" class="hidden fade-in">
             <div class="mb-8">
                 <h2 class="text-2xl font-bold text-emerald-900">Financial Engine & Simulator</h2>
-                <p class="text-slate-600 mt-1">Calculate the upfront capital required for 2033, and simulate how your SIPs need to scale once you hit your 7LPA package.</p>
+                <p class="text-slate-600 mt-1">Simulate scaling your SIPs against the inflation-adjusted 2033 targets.</p>
             </div>
 
-            <!-- Upfront Costs Comparison -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
-                <h3 class="font-bold text-lg text-slate-800 mb-2 text-center">Projected Upfront Capital Required by 2033 (Inflation Adjusted)</h3>
-                <p class="text-sm text-slate-500 text-center mb-6">Compare the massive difference between landing a direct job vs. needing a Blocked Account.</p>
+                <h3 class="font-bold text-lg text-slate-800 mb-2 text-center">Projected Upfront Capital (2033 Target)</h3>
                 <div class="chart-container">
                     <canvas id="costChart"></canvas>
                 </div>
             </div>
 
-            <!-- SIP Simulator -->
             <div class="grid lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center border-t-4 border-t-emerald-500">
-                    <h3 class="font-bold text-slate-800 mb-4">Corpus Builder (7-Year Horizon)</h3>
-                    <p class="text-xs text-slate-500 mb-4">You have ₹52k baseline (40k + 12k SIP). Use the slider to simulate increasing your monthly SIP from your new 7LPA salary (approx. ₹50k/mo in hand).</p>
+                <div class="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 border-t-4 border-t-emerald-500">
+                    <h3 class="font-bold text-slate-800 mb-4">7-Year Corpus Builder</h3>
+                    <p class="text-xs text-slate-500 mb-4">Base: ₹52k (40k + 12mo SIP). Scale your SIP with the new 7LPA (~50k in-hand) salary.</p>
                     
                     <label for="sipSlider" class="block text-sm font-bold text-slate-700 mb-2">Monthly SIP (₹)</label>
                     <input type="range" id="sipSlider" min="1000" max="30000" step="500" value="5000" class="mb-4">
@@ -304,9 +337,7 @@
                         <span id="sipValueDisplay" class="text-3xl font-bold text-emerald-600">₹5,000</span>
                     </div>
 
-                    <div id="simResult" class="text-sm p-4 rounded-lg font-medium leading-relaxed transition-colors duration-300">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div id="simResult" class="text-sm p-4 rounded-lg font-medium leading-relaxed transition-colors duration-300"></div>
                 </div>
 
                 <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
@@ -318,98 +349,256 @@
             </div>
         </section>
 
+        <!-- TAB 5: ACTION PLAN -->
+        <section id="sec-action" class="hidden fade-in">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-slate-900">🎯 Phase 1 To-Do List (2026 - 2028)</h2>
+                <p class="text-slate-600 mt-2">Your progress is automatically saved locally to your browser.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Task List Container -->
+                <div class="lg:col-span-2 space-y-6" id="task-container">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Donut Chart Dashboard -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sticky top-24">
+                        <h2 class="text-xl font-bold text-slate-800 mb-2 text-center">Phase 1 Readiness</h2>
+                        <p class="text-xs text-slate-500 text-center mb-6">Complete tasks to fill your meter.</p>
+                        
+                        <div class="donut-container">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+
+                        <div class="mt-6 text-center">
+                            <div class="text-4xl font-bold text-slate-800" id="percent-display">0%</div>
+                            <p class="text-sm font-medium text-indigo-600 mt-2" id="status-message">Let's get started!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
+    <!-- App Logic (Vanilla JS with Local Storage) -->
     <script>
-        // State Management
+        // --- State Management ---
         let costChartInstance = null;
         let growthChartInstance = null;
+        let progressChartInstance = null;
         
         // Simulator Constants
         const startYear = 2026;
         const targetYear = 2033;
         const yearsToInvest = targetYear - startYear;
-        const targetCorpus2033 = 1600000; // 16 Lakhs for Chancenkarte/MS
-        const currentBase = 52000; // 40k emergency + (1k * 12 months)
-        const expectedAnnualReturn = 0.10; // 10%
+        const targetCorpus2033 = 1600000;
+        const currentBase = 52000;
+        const expectedAnnualReturn = 0.10;
+        const LOCAL_STORAGE_KEY = 'germany_roadmap_tasks_v1';
 
-        // Tab Switching Logic
-        function switchTab(tabId) {
-            // Reset styles
+        // Task Data (Updated for AI)
+        const tasks = [
+            {
+                category: "AI Engineering & Tech Engine", class: "tech", icon: "💻",
+                items: [
+                    { id: "t1", text: "Secure Full-Time SDE Conversion at Cerence (Sept 2026).", weight: 15 },
+                    { id: "t2", text: "Deep Specialization: Shift focus heavily into AI Engineering (Training/Fine-tuning LLMs) or building robust MLOps systems.", weight: 15 },
+                    { id: "t3", text: "Acquire a formal Cloud/AI Certification (e.g., AWS Machine Learning Specialty).", weight: 10 },
+                    { id: "t4", text: "Publish 2 public GitHub repos featuring fine-tuned open-source models or RAG applications.", weight: 10 }
+                ]
+            },
+            {
+                category: "Linguistic Engine", class: "lang", icon: "🇩🇪",
+                items: [
+                    { id: "l1", text: "Pass Goethe-Zertifikat A1 by October 2026.", weight: 10 },
+                    { id: "l2", text: "Enroll in A2 immediately after passing A1.", weight: 10 },
+                    { id: "l3", text: "Change phone and IDE languages to German.", weight: 5 }
+                ]
+            },
+            {
+                category: "Financial Engine (Critical)", class: "finance", icon: "📈",
+                items: [
+                    { id: "f1", text: "September '26: Calculate new in-hand 7LPA salary (~₹50k/month).", weight: 5 },
+                    { id: "f2", text: "Upgrade SIP from ₹1k to min. ₹10k/mo upon full-time conversion.", weight: 15 },
+                    { id: "f3", text: "Lock away the ₹40k emergency fund. Never use it for investments.", weight: 5 }
+                ]
+            }
+        ];
+
+        // --- Navigation Logic ---
+        window.switchTab = function(tabId) {
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active', 'text-indigo-600', 'bg-slate-50');
                 btn.classList.add('text-slate-600');
             });
             document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden'));
 
-            // Apply active styles
             const activeBtn = document.getElementById(`btn-${tabId}`);
-            activeBtn.classList.remove('text-slate-600');
-            activeBtn.classList.add('active', 'text-indigo-600', 'bg-slate-50');
-            
+            if(activeBtn) {
+                activeBtn.classList.remove('text-slate-600');
+                activeBtn.classList.add('active', 'text-indigo-600', 'bg-slate-50');
+            }
             document.getElementById(`sec-${tabId}`).classList.remove('hidden');
 
-            // Lazy load charts only when Finance tab is opened
-            if (tabId === 'finance') {
-                if(!costChartInstance && !growthChartInstance) {
-                    initCharts();
+            // Lazy Load Charts
+            if (tabId === 'finance' && !costChartInstance) initFinanceCharts();
+            if (tabId === 'action' && !progressChartInstance) initActionChart();
+        }
+
+        // --- Action Plan UI & Local Storage Logic ---
+        function renderTasks() {
+            const container = document.getElementById('task-container');
+            container.innerHTML = ''; 
+            
+            tasks.forEach(section => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = "bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden";
+                
+                let headerColor = "";
+                if(section.class === 'tech') headerColor = "text-indigo-700 bg-indigo-50 border-b border-indigo-100";
+                if(section.class === 'lang') headerColor = "text-amber-700 bg-amber-50 border-b border-amber-100";
+                if(section.class === 'finance') headerColor = "text-emerald-700 bg-emerald-50 border-b border-emerald-100";
+
+                let html = `<div class="px-6 py-4 ${headerColor}"><h2 class="text-lg font-bold flex items-center gap-2"><span>${section.icon}</span> ${section.category}</h2></div><div class="p-2">`;
+
+                section.items.forEach(item => {
+                    html += `
+                        <label class="task-card ${section.class} flex items-start gap-4 p-4 rounded-lg cursor-pointer" id="label-${item.id}">
+                            <input type="checkbox" class="custom-checkbox mt-0.5 flex-shrink-0" id="${item.id}" data-weight="${item.weight}" onchange="window.handleTaskToggle('${item.id}')">
+                            <span class="task-text text-slate-700 font-medium text-sm leading-relaxed">${item.text}</span>
+                        </label>
+                    `;
+                });
+                html += `</div>`;
+                sectionDiv.innerHTML = html;
+                container.appendChild(sectionDiv);
+            });
+        }
+
+        function loadTasksFromLocalStorage() {
+            try {
+                const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (savedData) {
+                    const completed = JSON.parse(savedData);
+                    document.querySelectorAll('.custom-checkbox').forEach(cb => {
+                        if (completed.includes(cb.id)) {
+                            cb.checked = true;
+                            document.getElementById(`label-${cb.id}`).classList.add('task-completed');
+                        }
+                    });
                 }
+            } catch (e) {
+                console.error("Could not load from localStorage", e);
             }
         }
 
-        // Math Logic for SIP
-        function calculateCompoundGrowth(monthlyContribution) {
-            let labels = [];
-            let growthData = [];
-            let targetLineData = [];
-            
-            let balance = currentBase;
+        function setSyncStatus(status) {
+            const el = document.getElementById('sync-indicator');
+            el.className = `text-xs font-bold local-sync flex items-center bg-slate-100 px-3 py-1.5 rounded-full ${status}`;
+            if(status === 'saving') el.innerHTML = '🔄 Saving...';
+            if(status === 'saved') {
+                el.innerHTML = '💾 Saved Locally';
+                setTimeout(() => setSyncStatus('idle'), 2000);
+            }
+        }
 
+        window.handleTaskToggle = function(id) {
+            // Local UI Update
+            const checkbox = document.getElementById(id);
+            const label = document.getElementById(`label-${id}`);
+            if (checkbox.checked) label.classList.add('task-completed');
+            else label.classList.remove('task-completed');
+            updateProgressUI();
+
+            // Save to Local Storage
+            setSyncStatus('saving');
+            const completed = [];
+            document.querySelectorAll('.custom-checkbox').forEach(cb => {
+                if (cb.checked) completed.push(cb.id);
+            });
+            
+            try {
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(completed));
+                setTimeout(() => setSyncStatus('saved'), 300); // slight delay for visual effect
+            } catch (error) {
+                console.error("Error saving task:", error);
+                setSyncStatus('idle');
+            }
+        }
+
+        function updateProgressUI() {
+            const checkboxes = document.querySelectorAll('.custom-checkbox');
+            if(checkboxes.length === 0) return;
+
+            let totalWeight = 0, earnedWeight = 0;
+            checkboxes.forEach(cb => {
+                const weight = parseInt(cb.dataset.weight);
+                totalWeight += weight;
+                if (cb.checked) earnedWeight += weight;
+            });
+
+            const percent = Math.round((earnedWeight / totalWeight) * 100);
+            document.getElementById('percent-display').innerText = `${percent}%`;
+            
+            const statusMsg = document.getElementById('status-message');
+            if (percent === 0) { statusMsg.innerText = "A journey of a thousand miles begins..."; statusMsg.className = "text-sm font-medium text-slate-500 mt-2"; }
+            else if (percent < 50) { statusMsg.innerText = "Building the foundation. Keep going!"; statusMsg.className = "text-sm font-medium text-amber-500 mt-2"; }
+            else if (percent < 100) { statusMsg.innerText = "Great momentum! You are on track."; statusMsg.className = "text-sm font-medium text-indigo-500 mt-2"; }
+            else { statusMsg.innerText = "Phase 1 Complete! Ready for Phase 2."; statusMsg.className = "text-sm font-bold text-emerald-600 mt-2"; }
+
+            if (progressChartInstance) {
+                progressChartInstance.data.datasets[0].data = [percent, 100 - percent];
+                progressChartInstance.data.datasets[0].backgroundColor = [percent === 100 ? '#10b981' : '#6366f1', '#e2e8f0'];
+                progressChartInstance.update();
+            }
+        }
+
+        // --- Chart Initializations ---
+        function initActionChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            progressChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'Remaining'],
+                    datasets: [{ data: [0, 100], backgroundColor: ['#6366f1', '#e2e8f0'], borderWidth: 0, cutout: '80%' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+            });
+            updateProgressUI(); 
+        }
+
+        function calculateCompoundGrowth(monthlyContribution) {
+            let labels = [], growthData = [], targetLineData = [], balance = currentBase;
             for (let i = 0; i <= yearsToInvest; i++) {
                 labels.push(startYear + i);
                 growthData.push(Math.round(balance));
                 targetLineData.push(targetCorpus2033);
-                
-                // Add 12 months SIP + 10% compound
                 balance = (balance + (monthlyContribution * 12)) * (1 + expectedAnnualReturn);
             }
-
             return { labels, growthData, targetLineData };
         }
 
-        // Initialize both Chart.js instances
-        function initCharts() {
-            // --- Chart 1: Bar Chart (Upfront Costs) ---
+        function initFinanceCharts() {
+            // Bar Chart
             const ctxCost = document.getElementById('costChart').getContext('2d');
             costChartInstance = new Chart(ctxCost, {
                 type: 'bar',
                 data: {
-                    labels: ['Direct IT Job Offer', 'Job Seeker (Chancenkarte)', 'MS Student Route'],
+                    labels: ['Direct Job Offer', 'Job Seeker (Chancenkarte)', 'MS Student Route'],
                     datasets: [{
                         label: 'Estimated Initial Cost (INR)',
                         data: [350000, 1600000, 1750000],
-                        backgroundColor: [
-                            'rgba(16, 185, 129, 0.8)', // Emerald (Direct Job - Low Cost)
-                            'rgba(99, 102, 241, 0.8)', // Indigo (Job Seeker - High)
-                            'rgba(245, 158, 11, 0.8)'  // Amber (Student - High)
-                        ],
+                        backgroundColor: ['#10b981', '#6366f1', '#f59e0b'],
                         borderRadius: 6
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { callbacks: { label: (ctx) => '₹ ' + (ctx.raw/100000).toFixed(2) + ' Lakhs' } }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { callback: (val) => '₹' + (val/100000) + 'L' } }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: (val) => '₹' + (val/100000) + 'L' } } } }
             });
 
-            // --- Chart 2: Line Chart (SIP Growth) ---
+            // Line Chart
             const ctxGrowth = document.getElementById('growthChart').getContext('2d');
             const slider = document.getElementById('sipSlider');
             const initialSimData = calculateCompoundGrowth(parseInt(slider.value));
@@ -419,71 +608,44 @@
                 data: {
                     labels: initialSimData.labels,
                     datasets: [
-                        {
-                            label: 'Your Projected Portfolio (₹)',
-                            data: initialSimData.growthData,
-                            borderColor: '#10b981', // Emerald
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Target Blocked Account Level (₹16L)',
-                            data: initialSimData.targetLineData,
-                            borderColor: '#ef4444', // Red
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            pointRadius: 0,
-                            fill: false
-                        }
+                        { label: 'Projected Portfolio (₹)', data: initialSimData.growthData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 3, fill: true, tension: 0.4 },
+                        { label: 'Target Blocked Account (₹16L)', data: initialSimData.targetLineData, borderColor: '#ef4444', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ₹' + ctx.raw.toLocaleString('en-IN') } }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { callback: (val) => '₹' + (val/100000).toFixed(1) + 'L' } }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, scales: { y: { ticks: { callback: (val) => '₹' + (val/100000).toFixed(1) + 'L' } } } }
             });
 
-            // Initial text update
             updateSimulationDisplay();
-
-            // Slider Event Listener
             slider.addEventListener('input', function() {
                 document.getElementById('sipValueDisplay').innerText = '₹' + parseInt(this.value).toLocaleString('en-IN');
                 updateSimulationDisplay();
             });
         }
 
-        // Update Line Chart data and Result Text based on Slider
         function updateSimulationDisplay() {
             const monthlySip = parseInt(document.getElementById('sipSlider').value);
             const simData = calculateCompoundGrowth(monthlySip);
-            
-            // Update chart data
             growthChartInstance.data.datasets[0].data = simData.growthData;
             growthChartInstance.update();
 
-            // Update text logic
             const finalCorpus = simData.growthData[simData.growthData.length - 1];
             const resultBox = document.getElementById('simResult');
 
             if (finalCorpus >= targetCorpus2033) {
                 resultBox.className = "text-sm p-4 rounded-lg font-medium bg-emerald-50 border border-emerald-200 text-emerald-800";
-                resultBox.innerHTML = `✅ <strong>Target Secured!</strong> Investing ₹${monthlySip.toLocaleString('en-IN')}/mo easily covers the ₹16L requirement by 2033 (Proj. <strong>₹${(finalCorpus/100000).toFixed(2)}L</strong>). This gives you the freedom to choose either the Chancenkarte or MS route if you don't land a direct job.`;
+                resultBox.innerHTML = `✅ <strong>Target Secured!</strong> ₹${monthlySip.toLocaleString('en-IN')}/mo yields approx <strong>₹${(finalCorpus/100000).toFixed(2)}L</strong> by 2033.`;
             } else {
                 resultBox.className = "text-sm p-4 rounded-lg font-medium bg-amber-50 border border-amber-200 text-amber-800";
-                resultBox.innerHTML = `⚠️ <strong>Shortfall.</strong> At ₹${monthlySip.toLocaleString('en-IN')}/mo, you only reach <strong>₹${(finalCorpus/100000).toFixed(2)}L</strong>. You will be forced to rely ONLY on getting a Direct Job Offer, as you won't have funds for the Chancenkarte or MS Blocked Account. Increase SIP from your 7LPA salary.`;
+                resultBox.innerHTML = `⚠️ <strong>Shortfall.</strong> ₹${monthlySip.toLocaleString('en-IN')}/mo yields <strong>₹${(finalCorpus/100000).toFixed(2)}L</strong>. Adjust to reach ₹16L.`;
             }
         }
+
+        // --- App Boot ---
+        window.addEventListener('DOMContentLoaded', () => {
+            renderTasks();
+            loadTasksFromLocalStorage();
+        });
+
     </script>
 </body>
 </html>
